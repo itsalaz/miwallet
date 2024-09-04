@@ -55,7 +55,6 @@ class PinScreenView: NSObject {
   @objc
   func verifyPin(_ pin: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let isValid = (pin == "123456") // Example validation
-    
     if isValid {
       resolve(true)
     } else {

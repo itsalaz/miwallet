@@ -5,7 +5,7 @@
 //  Created by Elizabeth Delgado on 9/3/24.
 //
 
-#import <Foundation/Foundation.h>
+//#import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
 
 

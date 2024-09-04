@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { StatusBar, Text} from 'react-native'
+import { StatusBar, Text, Button, Alert } from 'react-native'
 import NumberPad from '../NumberPad'
 import Card from './Card'
 import styled from 'styled-components'
@@ -11,21 +11,43 @@ export default PinScreen = ({navigation}) => {
   const [pinCount, setPinCount] = useState(0)
   const [pin, setPin] = useState('')
   const totalPins = 6 
-  
-  // if (PinScreenView) {
-  //   PinScreenView.verifyPin("123456")
-  //     .then((result) => console.log(result))
-  //     .catch((error) => console.error(error));
-  // } else {
-  //   console.error("PinScreenView is not available");
-  // }
+  const correctPin = '123456'
+
+
+
 
   useEffect(() => {
-      if(pinCount == totalPins) {
-        router.push('/Card')
-      } 
-    }, [pinCount])
-   
+    if (pinCount === totalPins) {
+      if (pin === correctPin) {
+        Alert.alert('Success', 'PIN is correct!', [
+          {
+            onPress: () => navigation.navigate('Card'), 
+          },
+        ]);
+      } else {
+        Alert.alert('Error', 'The passcode you entered is incorrect. Please try again.');
+        setPin('');
+        setPinCount(0);
+      }
+    }
+  }, [pinCount, pin, navigation]);
+
+  // useEffect(() => {
+  //     if(pinCount === totalPins) {
+  //       PinScreenView.verifyPin(pin)
+  //       .then(() => {
+  //         navigation.navigate('Card')
+  //       })
+  //       .catch(() => {
+  //         Alert.alert('Incorrect PIN', 'Please try again.')
+  //         setPin('')
+  //         setPinCount(0)
+  //       })
+  //       }
+  //     }, [pinCount,])
+
+
+
 
     const renderPins = () => {
     const pins = []
@@ -34,10 +56,12 @@ export default PinScreen = ({navigation}) => {
       pins.push(
         x <= pinCount ? (
           <PinContainer key={x}>   
-            <Pin />
+            <FilledPin />
           </PinContainer>
         ) : ( 
-        <PinContainer key={x}/>
+        <PinContainer key={x}>
+          <Pin />
+        </PinContainer>
         )
       );
     }
@@ -45,12 +69,6 @@ export default PinScreen = ({navigation}) => {
   }
 
 
- 
-  // const pressKey = (_, index) => {
-  //   setPinCount(prev => {
-  //     return index != 10 ? prev + 1 : prev - 1
-  //   })
-  //   }
 
   const pressKey = (key, index) => {
     if(index !== 10) {
@@ -66,19 +84,20 @@ export default PinScreen = ({navigation}) => {
     }
   }
 
+
     
   return (
     <Container>
       <Text center heavy title color='#964ff0' margin={['32px 0 0 0']}></Text>
-      <Text center heavy medium margin={['32px 0 0 0']}>
+      <CenteredText center heavy medium margin={['32px 0 0 0']} > 
         Enter your PIN code.
-      </Text>
+      </CenteredText>
       <AccessPin>
       {renderPins()}
       </AccessPin>
-      <Text center bold margin={['8px 0 0 0']} color='9c9c9f'>
+      <CenteredText center bold margin={['8px 0 0 0']} color='9c9c9f'>
         Forgot PIN?
-      </Text>
+      </CenteredText>
       <NumberPad onPress={pressKey}/>
       <StatusBar barStyle='light-content' />
  
@@ -90,14 +109,17 @@ export default PinScreen = ({navigation}) => {
 const Container = styled.SafeAreaView`
   flex: 1;
   background-color: #lelele;
+  justify-content: center;
 `;
 
 const AccessPin = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin: 32px 64px 10px 64px;
+  padding-bottom: 20px;
 
 `;
+
 
 const UseTouch = styled.TouchableOpacity`
   margin: 32px 0 64px 0;
@@ -131,4 +153,8 @@ const FilledPin = styled.View `
   border-radius: 6px;
   background-color: #5196f4
 
+`
+
+const CenteredText = styled(Text) `
+  text-align: center;
 `
