@@ -4,6 +4,7 @@ import NumberPad from '../NumberPad'
 import Card from './Card'
 import styled from 'styled-components'
 
+// ** ADD WEBHOOK
 // const { PinScreenView} = NativeModules;
 
 
@@ -67,7 +68,6 @@ export default PinScreen = ({navigation}) => {
     }
     return pins;
   }
-
 
 
   const pressKey = (key, index) => {
