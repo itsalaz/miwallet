@@ -1,30 +1,45 @@
 import { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native'
-import { CardField } from '@stripe/stripe-react-native'
-import { StripeProvider, useConfirmPayment } from'@stripe/stripe-react-native'
+import { StyleSheet, Text, View, TextInput, Button, Image, Alert } from 'react-native'
+import { CardField, StripeProvider, useConfirmPayment } from'@stripe/stripe-react-native'
+import Confirmation from './Confirmation'
+import PaymentSheet from'./PaymentSheet'
+import { useNavigation } from '@react-navigation/native'
 
 
-const API_URL = 'http://localhost:6789'
+const API_URL = 'http://127.0.0.1:5555'
 
 const Card = props => {
   const [ isReady, setIsReady ] = useState(false)
-  // const [email, setEmail] = useState('')
-  // const [cardDetails, setCardDetails] = useState('')
   const { confirmPayment, loading } = useConfirmPayment()
-
+  const [ email, setEmail ] = useState('')
+  const navigation = useNavigation()
+  
   const fetchPaymentIntentClientSecret = async () => {
-    const response = await fetch(`${API_URL}/
-    create-payment-intent`, {
-      method: "POST", 
-      headers: {
-        "Content-Type": "application/json"
+    try {
+      const response = await fetch(`${API_URL}/pay`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          amount: 5000, 
+        }),
+      });
+  
+      const { clientSecret, error } = await response.json()
+      
+      if (error) {
+        throw new Error(error)
       }
-    })
-    const { clientSecret,error} = await response.json()
-    return {clientSecret, error}
+  
+      return clientSecret
+    } catch (error) {
+      console.error("Failed to fetch client secret:", error)
+      return null
+    }
   }
 
-    
 
     const Pay = async () => {
       const clientSecret = await fetchPaymentIntentClientSecret()
@@ -37,19 +52,21 @@ const Card = props => {
       } else if (paymentIntent) {
         Alert.alert(
           'Success', 
-          `The payment was confirmed successfully! currency" ${paymentIntent.currency}`
-        )
+          `The payment was confirmed successfully!`)
+          navigation.navigate('Confirmation')
       }
     }
+  
 
 
     return (
       <View style={styles.container}>
       <StripeProvider 
       publishableKey='pk_test_51PtD9yRqqjKBjICaX79G8pD1vvUDw4Q4CutFZ8pO8fTT5yiIEWkPiJQIgVnblsAo9kb55lpx9FpDHmpLKoiTzJYZ00iEYmPgqb'
-      // add merchantIdentifier
+      merchantIdentifier='MERCHANT_ID'
       >
-      <Text>I am something to purchase</Text>
+      <Text style={styles.price}>$50</Text>
+      <Image source={require('/Users/elizabethdelgado/development/code/phase-5/miwallet/Assets/WGTFLW.jpg')} style={styles.image}/>
       <TextInput 
         autoCapitalize='none'
         placeholder='E-mail'
@@ -69,6 +86,7 @@ const Card = props => {
         }}  // -- verification of real card payment
         />
         <Button onPress={Pay} title='Pay'/> 
+        <Button onPress={() => navigation.navigate('PaymentSheet')} title='Alternative Payment'/>
       </StripeProvider>
       </View>
     ) 
@@ -95,7 +113,17 @@ const styles = StyleSheet.create({
     height: 50, 
     marginVertical: 30, 
 
+  }, 
+  cardField: {
+    height: 50,
+  },
+  image: {
+    height: 150, 
+    width: 200, 
+    resizeMode: 'contain',
+    marginLeft: 40,
+  },
+  price: {
+    textAlign: 'center',
   }
 })
-
-
