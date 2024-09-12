@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Image, Text, View, Alert, StyleSheet, Platform } from 'react-native'
+import { Button, Image, Text, View, Alert, StyleSheet, Platform, TextInput } from 'react-native'
 import { usePaymentSheet, StripeProvider } from '@stripe/stripe-react-native'
-
-
+// import Card from './Card'
+import { useNavigation } from '@react-navigation/native'
 
 const API_URL = 'http://127.0.0.1:5555'
 
 const PaymentSheet = () => {
   const [ ready, setReady ] = useState(false)
   const { initPaymentSheet, presentPaymentSheet, loading } = usePaymentSheet()
+  const navigation = useNavigation()
 
 
   useEffect(() => {
@@ -27,14 +28,14 @@ const PaymentSheet = () => {
         family: Platform.OS === 'android' ? 'menloregular' : 'Menlo-Regular'
       }, 
       colors: { 
-        primary: '#e06c75', 
-        background: '#e06c75', 
+        primary: '#d3d3d3', 
+        background: '#d3d3d3', 
         componentBackground: '#abb2bf',
         componentDivider: '#e5c07b', 
         primaryText: '#61afef', 
-        secondaryText: '#c678dd', 
+        secondaryText: '#4a4a4a', 
         componentText: '#282c34', 
-        icon: '#e06c75', 
+        icon: '#d3d3d3', 
         placeholderText: '#ffffff', 
       }, 
       shapes: { 
@@ -68,24 +69,24 @@ const PaymentSheet = () => {
       method: 'POST', 
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
     })
 
-    const {paymentIntent, ephemeralKey, customer} = await response.json()
+    const data = await response.json()
     return {
-      paymentIntent,
-      ephemeralKey, 
-      customer,
+      paymentIntent: data.paymentIntent,
+      ephemeralKey: data.ephemeralKey, 
+      customer: data.customer,
     }
   }
   
   const Pay = async() => {
     if(!ready) return
     const { error } = await presentPaymentSheet()
+    navigation.navigate('Card')
   }
+
   
-
-
 
   return (
     <View style={styles.container}>

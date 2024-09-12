@@ -4,9 +4,6 @@ import NumberPad from '../NumberPad'
 import Card from './Card'
 import styled from 'styled-components'
 
-// ** ADD WEBHOOK
-// const { PinScreenView} = NativeModules;
-
 
 export default PinScreen = ({navigation}) => {
   const [pinCount, setPinCount] = useState(0)
@@ -32,22 +29,6 @@ export default PinScreen = ({navigation}) => {
       }
     }
   }, [pinCount, pin, navigation]);
-
-  // useEffect(() => {
-  //     if(pinCount === totalPins) {
-  //       PinScreenView.verifyPin(pin)
-  //       .then(() => {
-  //         navigation.navigate('Card')
-  //       })
-  //       .catch(() => {
-  //         Alert.alert('Incorrect PIN', 'Please try again.')
-  //         setPin('')
-  //         setPinCount(0)
-  //       })
-  //       }
-  //     }, [pinCount,])
-
-
 
 
     const renderPins = () => {

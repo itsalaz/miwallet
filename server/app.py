@@ -10,11 +10,11 @@ from email.mime.text import MIMEText
 
 stripe.publishable_api_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
 
 
 
-
-@app.post('/api/passcode')
+@app.post('/passcode')
 def create_user():
     data = request.json
     try:
@@ -27,25 +27,31 @@ def create_user():
     except Exception as e:
         return { 'error': str(e) }, 406
 
-# @app.get('/api/check_session')
-# def check_session():
-#     user_id = session.get('user_id')
+@app.get('/check_session')
+def check_session():
+    user_id = session.get('user_id')
 
-#     if user_id:
-#         user = User.query.where(User.id == user_id).first()
-#         return user.to_dict(), 200
-#     else:
-#         return {}, 204
+    if user_id:
+        user = User.query.where(User.id == user_id).first()
+        return user.to_dict(), 200
+    else:
+        return {}, 204
 
-# @app.post('/api/login')
-# def login():
-#     data = request.json 
-#     user = User.query.where(User.username == data['username']).first()
-#     if user and user.authenticate(data['password']):
-#         session['user_id'] = user.id 
-#         return user.to_dict(), 201
-#     else:
-#         return { 'error': 'Invalid username or password' }, 401
+@app.post('/login')
+def login():
+    data = request.json 
+    user = User.query.where(User.username == data['username']).first()
+    if user and user.authenticate(data['password']):
+        session['user_id'] = user.id 
+        return user.to_dict(), 201
+    else:
+        return { 'error': 'Invalid username or password' }, 401
+
+
+@app.delete('/logout') 
+def logout():
+    session.pop('user_id')
+    return {}, 204
 
 @app.route('/')
 def index():
@@ -116,42 +122,22 @@ def create_payment_sheet():
         return jsonify(error=str(e)), 500
     
 
-def send_receipt(email, amount):
-    # sender = 'laz@laz.com'
-    # receiver = email
-    # subject = "Payment Receipt"
-    # body = f"Thank you for your payment of ${amount/100}."
+# def send_receipt(email, amount):
+#     subject = "Your Payment Receipt"
+#     body = f"Thank you for your payment of ${amount / 100:.2f}. Your transaction was successful!"
 
-    # msg = MIMEText(body)
-    # msg['Subject'] = subject 
-    # msg['From'] = sender 
-    # msg['To'] = receiver 
+#     msg = Message(
+#         subject=subject,
+#         sender=os.getenv('MAIL_USERNAME'),
+#         recipients=[email],
+#         body=body
+#     )
 
-
-    # try: 
-    #     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-    #         smtp.login(sender, 'Laz@laz.com')
-    #         smtp.sendmail(sender, receiver, msg.as_string())
-
-    #         print('Receipt sent successfully')
-    # except Exception as e:
-    #     print(f"Failed to send email: {str(e)}")
-
-    subject = "Your Payment Receipt"
-    body = f"Thank you for your payment of ${amount / 100:.2f}. Your transaction was successful!"
-
-    msg = Message(
-        subject=subject,
-        sender=os.getenv('MAIL_USERNAME'),
-        recipients=[email],
-        body=body
-    )
-
-    try:
-        mail.send(msg)
-        print(f"Receipt sent to {email}")
-    except Exception as e:
-        print(f"Failed to send email: {str(e)}")
+#     try:
+#         mail.send(msg)
+#         print(f"Receipt sent to {email}")
+#     except Exception as e:
+#         print(f"Failed to send email: {str(e)}")
                        
 
 @app.post('/confirmation')
@@ -169,12 +155,28 @@ def confirm_payment():
         return jsonify({'error': str(e)}), 400
 
 
+# @app.post('/webhook')
+# def stripe_webhook():
+#     payload = request.get_data(as_text=True)
+#     sig_header = request.headers.get('Stripe-Signature')
+#     endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+#     event = None 
 
-# @app.delete('/api/logout') 
-# def logout():
-#     session.pop('user_id')
-#     return {}, 204
+#     try:
+#         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+    
+#     except ValueError as e:
+#         return jsonify ({ 'error': 'Invalid payload'}), 400
+#     except stripe.error.SignatureVerificationError as e:
+#         return jsonify ({'error': 'Invalid signature'}), 400
+    
 
+#     if event['type'] == 'payment_intent.succeeded':
+#         payment_intent = event['data']['object']
+
+#         print("Payment intent was successful!")
+
+#     return jsonify(success=True), 200
 
 
 

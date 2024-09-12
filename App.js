@@ -1,7 +1,6 @@
-import React from 'react'
-// import StartScreen from './Screens/StartScreen'
-// import Login from './Screens/Login'
-// import Signup from './Screens/StartScreen'
+import { useState, useEffect } from 'react'
+import Login from './Screens/Login'
+import Signup from './Screens/Signup'
 import PinScreen from './Screens/PinScreen'
 import Card from "./Screens/Card"
 import Confirmation from './Screens/Confirmation'
@@ -19,6 +18,8 @@ const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 const App = () => {
 
+  const [currentUser, setCurrentUser] = useState(null)
+  const [loading, setLoading] = useState(null)
   // const [isBiometricSupported, setIsBiometricSupported] = useState(false)
   // const [isAunthenticated, setIsAuthenticated] = useState(false)
 
@@ -29,6 +30,7 @@ const App = () => {
   //     setIsBiometricSupported(compatible)
   //   })()
   // })
+
 
   function CardScreen() {
     return (
@@ -56,6 +58,26 @@ const App = () => {
       )
     }}
   />
+      <Tab.Screen
+    name='Login'
+    component={Login}
+    options={{title: 'Login', 
+    tabBarIcon: ({size, color}) => (
+      <MaterialCommunityIcons name='Login'
+      size={size} color={color} />
+      )
+    }}
+  />
+    <Tab.Screen
+    name='Signup'
+    component={Signup}
+    options={{title: 'Signup', 
+    tabBarIcon: ({size, color}) => (
+      <MaterialCommunityIcons name='Signup'
+      size={size} color={color} />
+      )
+    }}
+  />
     </Tab.Navigator>
     )
   }
@@ -63,14 +85,12 @@ const App = () => {
   return (
     <NavigationContainer>
     <Stack.Navigator initialRouteName="PinScreen"  screenOptions={{headerShown: false}} component={PinScreen}>
-      {/* <Stack.Screen name='Login' component={Login} />
-      <Stack.Screen name='Signup' component={Signup} /> */}
-      <Stack.Screen name='PinScreen' component={PinScreen} />
-      {/* <Elements stripe={stripePromise}> */}
+      {/* <Stack.Screen name='Login' component={Login}/>
+      <Stack.Screen name='Signup' component={Signup}/> */}
+      <Stack.Screen name='PinScreen' component={PinScreen}/>
       <Stack.Screen name='Card' component={Card} />
       <Stack.Screen name='PaymentSheet' component={PaymentSheet} />
       <Stack.Screen name='Confirmation' component={Confirmation} />
-      {/* </Elements>  */}
     </Stack.Navigator>
     </NavigationContainer>
   )
